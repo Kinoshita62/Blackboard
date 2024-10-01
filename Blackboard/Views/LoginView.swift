@@ -9,6 +9,7 @@ import SwiftUI
 
 struct LoginView: View {
     
+    @EnvironmentObject var authViewModel: AuthViewModel
     @State private var email = ""
     @State private var password = ""
     
@@ -31,17 +32,11 @@ struct LoginView: View {
                     
                     InputField(text: $password, label: "パスワード", placeholder: "半角英数字6文字以上", isSecureField: true)
 
-                    Button(action: {
-                        
-                    }, label: {
-                        Text("ログイン")
-                            .foregroundStyle(.black)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .fontWeight(.bold)
-                            .background(Color(.green))
-                            .clipShape(Capsule())
-                    })
+                    BasicButton(label: "ログイン", icon: "arrow.right") {
+                        Task {
+                            await authViewModel.login(email: email, password: password)
+                        }
+                    }
                     
                     Spacer()
                     
