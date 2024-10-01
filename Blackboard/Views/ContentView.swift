@@ -12,13 +12,14 @@ struct ContentView: View {
     @ObservedObject var authViewModel = AuthViewModel()
     
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        Group {
+            if authViewModel.userSession != nil {
+                MainView()
+            } else {
+                LoginView()
+            }
         }
-        .padding()
+        .environmentObject(authViewModel)
     }
 }
 
