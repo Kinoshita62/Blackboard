@@ -18,6 +18,10 @@ class AuthViewModel: ObservableObject {
     
     init() {
         self.userSession = Auth.auth().currentUser
+        print("ログインユーザー: \(self.userSession?.email)")
+        Task {
+            await self.fetchCurrentUser()
+        }
     }
     
     @MainActor

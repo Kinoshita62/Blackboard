@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CE2078C42CAD362A0066B8C1 /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2078C32CAD362A0066B8C1 /* BoardView.swift */; };
+		CE2078C62CAD38D70066B8C1 /* AddBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2078C52CAD38D70066B8C1 /* AddBoardView.swift */; };
 		CE9B57372CAA76C500AD7F7D /* BlackboardApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9B57362CAA76C500AD7F7D /* BlackboardApp.swift */; };
 		CE9B57392CAA76C500AD7F7D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9B57382CAA76C500AD7F7D /* ContentView.swift */; };
 		CE9B573B2CAA76C800AD7F7D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE9B573A2CAA76C800AD7F7D /* Assets.xcassets */; };
@@ -25,9 +27,14 @@
 		CEDE1D222CABB920006DD764 /* BasicButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDE1D212CABB920006DD764 /* BasicButton.swift */; };
 		CEDE1D242CABF111006DD764 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDE1D232CABF111006DD764 /* MainView.swift */; };
 		CEDE1D262CAC0154006DD764 /* MyPageRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDE1D252CAC0154006DD764 /* MyPageRow.swift */; };
+		CEDE1D282CAC31C2006DD764 /* BoardModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDE1D272CAC31C2006DD764 /* BoardModel.swift */; };
+		CEDE1D2A2CAC3450006DD764 /* MessageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDE1D292CAC3450006DD764 /* MessageModel.swift */; };
+		CEDE1D2C2CAC34E0006DD764 /* BoardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDE1D2B2CAC34E0006DD764 /* BoardViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		CE2078C32CAD362A0066B8C1 /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardView.swift; sourceTree = "<group>"; };
+		CE2078C52CAD38D70066B8C1 /* AddBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBoardView.swift; sourceTree = "<group>"; };
 		CE9B57332CAA76C500AD7F7D /* Blackboard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Blackboard.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE9B57362CAA76C500AD7F7D /* BlackboardApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlackboardApp.swift; sourceTree = "<group>"; };
 		CE9B57382CAA76C500AD7F7D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -44,6 +51,9 @@
 		CEDE1D212CABB920006DD764 /* BasicButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicButton.swift; sourceTree = "<group>"; };
 		CEDE1D232CABF111006DD764 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		CEDE1D252CAC0154006DD764 /* MyPageRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageRow.swift; sourceTree = "<group>"; };
+		CEDE1D272CAC31C2006DD764 /* BoardModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardModel.swift; sourceTree = "<group>"; };
+		CEDE1D292CAC3450006DD764 /* MessageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageModel.swift; sourceTree = "<group>"; };
+		CEDE1D2B2CAC34E0006DD764 /* BoardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,6 +121,8 @@
 			children = (
 				CE9B57382CAA76C500AD7F7D /* ContentView.swift */,
 				CEDE1D232CABF111006DD764 /* MainView.swift */,
+				CE2078C32CAD362A0066B8C1 /* BoardView.swift */,
+				CE2078C52CAD38D70066B8C1 /* AddBoardView.swift */,
 				CE9B57572CAA79E400AD7F7D /* LoginView.swift */,
 				CE9B575E2CAA878C00AD7F7D /* RegistrationView.swift */,
 				CEDE1D1B2CAB9E3C006DD764 /* MyPageView.swift */,
@@ -123,6 +135,8 @@
 			isa = PBXGroup;
 			children = (
 				CEDE1D192CAB9DAF006DD764 /* UserModel.swift */,
+				CEDE1D272CAC31C2006DD764 /* BoardModel.swift */,
+				CEDE1D292CAC3450006DD764 /* MessageModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -131,6 +145,7 @@
 			isa = PBXGroup;
 			children = (
 				CEDE1D1D2CAB9F8F006DD764 /* AuthViewModel.swift */,
+				CEDE1D2B2CAC34E0006DD764 /* BoardViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -230,13 +245,18 @@
 				CEDE1D1A2CAB9DAF006DD764 /* UserModel.swift in Sources */,
 				CE9B57582CAA79E400AD7F7D /* LoginView.swift in Sources */,
 				CE9B57392CAA76C500AD7F7D /* ContentView.swift in Sources */,
+				CE2078C62CAD38D70066B8C1 /* AddBoardView.swift in Sources */,
 				CEDE1D262CAC0154006DD764 /* MyPageRow.swift in Sources */,
 				CE9B57372CAA76C500AD7F7D /* BlackboardApp.swift in Sources */,
 				CEDE1D222CABB920006DD764 /* BasicButton.swift in Sources */,
 				CEDE1D242CABF111006DD764 /* MainView.swift in Sources */,
+				CEDE1D2A2CAC3450006DD764 /* MessageModel.swift in Sources */,
 				CE9B575D2CAA83FB00AD7F7D /* InputField.swift in Sources */,
 				CE9B575F2CAA878C00AD7F7D /* RegistrationView.swift in Sources */,
+				CEDE1D282CAC31C2006DD764 /* BoardModel.swift in Sources */,
+				CE2078C42CAD362A0066B8C1 /* BoardView.swift in Sources */,
 				CEDE1D1E2CAB9F8F006DD764 /* AuthViewModel.swift in Sources */,
+				CEDE1D2C2CAC34E0006DD764 /* BoardViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

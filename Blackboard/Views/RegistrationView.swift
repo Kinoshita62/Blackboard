@@ -36,7 +36,7 @@ struct RegistrationView: View {
             VStack(spacing: 24) {
                 InputField(text: $email, label: "メールアドレス", placeholder: "入力してください", keyboardType: .emailAddress)
                 
-                InputField(text: $name, label: "お名前", placeholder: "入力してください")
+                InputField(text: $name, label: "お名前 (8文字以内)", placeholder: "入力してください")
                 
                 PickerField(selection: $age, title: "年齢")
                 
@@ -46,13 +46,15 @@ struct RegistrationView: View {
                     .textContentType(.none)
                 
                 BasicButton(label: "登録", icon: "arrow.right") {
-                    Task {
-                        await authViewModel.createAccount(
-                            email: email,
-                            password: password,
-                            name: name,
-                            age: age
-                        )
+                    if name.count < 9 {
+                        Task {
+                            await authViewModel.createAccount(
+                                email: email,
+                                password: password,
+                                name: name,
+                                age: age
+                            )
+                        }
                     }
                 }
                 
