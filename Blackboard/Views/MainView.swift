@@ -46,7 +46,7 @@ struct MainView: View {
                     Spacer()
                     NavigationLink {
                         MyPageView()
-                           
+                            .navigationBarBackButtonHidden(true)
                     } label: {
                         Image(systemName: "person.circle")
                             .font(.system(size: 35))

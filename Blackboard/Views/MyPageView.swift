@@ -15,23 +15,37 @@ struct MyPageView: View {
     
     var body: some View {
         VStack {
-                Capsule()
-                    .foregroundStyle(.white)
-                    .frame(width: 96, height: 96)
-                    .overlay(
-                        Circle()
-                            .stroke(Color.gray.opacity(0.5), lineWidth: 1)
-                    )
+                
             List {
                 Section {
-                    HStack(spacing: 24) {
-                        Text(authViewModel.currentUser?.name ?? "ユーザーネーム")
-                            .font(.subheadline)
-                            .fontWeight(.bold)
-                        
-                        Text(authViewModel.currentUser?.email ?? "メールアドレス")
-                            .font(.footnote)
-                            .tint(.gray)
+                    HStack(spacing: 16) {
+                        if let urlString = authViewModel.currentUser?.photoUrl, let url = URL(string: urlString) {
+                            AsyncImage(url: url) { image in
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 48, height: 48)
+                                    .clipShape(Circle())
+                            } placeholder: {
+                                ProgressView()
+                                    .frame(width: 48, height: 48 )
+                            }
+                        } else {
+                            Image(systemName: "person.circle")
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 48, height: 48)
+                                .clipShape(Circle())
+                        }
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(authViewModel.currentUser?.name ?? "")
+                                .font(.subheadline)
+                                .fontWeight(.bold)
+                            Text(authViewModel.currentUser?.email ?? "")
+                                .font(.footnote)
+                                .tint(.gray)
+                        }
                     }
                 }
                 
@@ -41,7 +55,7 @@ struct MyPageView: View {
                     }
                 }
                 
-                Section {
+                Section() {
                     VStack(spacing: 8) {
                         Button {
                             authViewModel.logout()

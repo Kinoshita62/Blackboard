@@ -25,14 +25,14 @@ class AuthViewModel: ObservableObject {
     }
     
     @MainActor
-    func createAccount(email: String, password: String, name: String, age: String) async {
+    func createAccount(email: String, password: String, name: String, age: AgeGroup, sex: Gender) async {
         do {
             let result = try await Auth.auth().createUser(withEmail: email, password: password)
             print("成功: \(result.user.email)")
             DispatchQueue.main.async {
                 self.userSession = result.user
             }
-            let newUser = UserModel(id: result.user.uid, name: name, email: email, age: age)
+            let newUser = UserModel(id: result.user.uid, name: name, email: email, age: age, sex: sex)
             await uploadUserData(withUser: newUser)
             await self.fetchCurrentUser()
         }catch {

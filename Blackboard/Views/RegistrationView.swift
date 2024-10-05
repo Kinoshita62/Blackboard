@@ -13,7 +13,8 @@ struct RegistrationView: View {
     
     @State private var email = ""
     @State private var name = ""
-    @State private var age = "10代"
+    @State private var age: AgeGroup = .teens
+    @State private var sex: Gender = .male
     @State private var password = ""
     @State private var confirmPassword = ""
     
@@ -38,7 +39,10 @@ struct RegistrationView: View {
                 
                 InputField(text: $name, label: "お名前 (8文字以内)", placeholder: "入力してください")
                 
-                PickerField(selection: $age, title: "年齢")
+                PickerComponent(title: "年齢", selection: $age)
+                
+                PickerComponent(title: "性別", selection: $sex)
+                
                 
                 InputField(text: $password, label: "パスワード", placeholder: "半角英数字6文字以上", isSecureField: true)
                 
@@ -52,13 +56,12 @@ struct RegistrationView: View {
                                 email: email,
                                 password: password,
                                 name: name,
-                                age: age
+                                age: age,
+                                sex: sex
                             )
                         }
                     }
                 }
-                
-                Spacer()
                 
                 Button {
                     dismiss()

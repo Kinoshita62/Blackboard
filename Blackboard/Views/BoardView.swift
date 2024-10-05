@@ -19,6 +19,14 @@ struct BoardView: View {
         VStack {
             VStack {
                 HStack {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "lessthan")
+                            .foregroundStyle(.black)
+                            .font(.title2)
+                    }
+
                     Text(board.name)
                         .font(.largeTitle)
                         .padding()
