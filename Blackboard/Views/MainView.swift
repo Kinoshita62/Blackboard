@@ -20,6 +20,7 @@ struct MainView: View {
         GridItem(.flexible(), spacing: 16)
     ]
     
+    
     var filteredBoards: [BoardModel] {
         let boards: [BoardModel] //元データはそのままに
             
@@ -39,95 +40,11 @@ struct MainView: View {
     var body: some View {
         NavigationStack {
             VStack {
+                header
                 
-                HStack {
-                    Text("Blackboard")
-                        .font(.title)
-                    Spacer()
-                    NavigationLink {
-                        MyPageView()
-                            .navigationBarBackButtonHidden(true)
-                    } label: {
-                        Image(systemName: "person.circle")
-                            .font(.system(size: 35))
-                            .foregroundStyle(.green)
-                    }
-                    Circle()
-                        .frame(width: 35, height: 35)
-                }
-                
-                
-                HStack {
-                    TextField("掲示板を検索", text: $searchText)
-                        .padding(10)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .padding(.horizontal)
-                }
-                
-                HStack {
-                    
-                    Spacer()
-                    
-                    Button(action: {
-                        isSortedByPostCount = false
-                    }, label: {
-                        Text("日付順")
-                            .foregroundStyle(isSortedByPostCount ? Color.gray : Color.blue)
-                    })
-                    Text("/")
-                    Button(action: {
-                        isSortedByPostCount = true
-                    }, label: {
-                        Text("投稿数順")
-                            .foregroundStyle(isSortedByPostCount ? Color.blue : Color.gray)
-                    })
-                }
-                
-                
-                ScrollView {
-                    LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(filteredBoards) { board in
-                            NavigationLink(destination: BoardView(board: board)) {
-                                VStack {
-                                    Text(board.name)
-                                        .font(.headline)
-                                        
-                                    Text("投稿数 \(board.postCount)")
-                                        
-                                    Text("作成日" + formatDate(board.createDate))
-                                        
-                                }
-                                .foregroundColor(.black)
-                                .frame(width: 150, height: 150)
-//
-                                .background(Color.green)
-                                .shadow(radius: 5)
-                            }
-                        }
-                    }
-                    .padding()
-                }
-                .onAppear {
-                    boardViewModel.fetchBoards()
-                }
-                
-                Spacer()
-                
-                HStack {
-                    Spacer()
-                    Button(action: {
-                        isShowingAddBoardView.toggle()
-                    }) {
-                        Image(systemName: "plus")
-                            .font(.largeTitle)
-                            .frame(width: 60, height: 60)
-                            .foregroundColor(.white)
-                            .background(Color.green)
-                            .clipShape(Circle())
-                            .shadow(radius: 10)
-                        }
-                        .padding()
-                    }
+                searchFilterArea
+            
+                boardListArea
             }
             .padding(.horizontal)
             .sheet(isPresented: $isShowingAddBoardView) {
@@ -149,4 +66,88 @@ struct MainView: View {
 #Preview {
     MainView()
         .environmentObject(AuthViewModel())
+}
+
+extension MainView {
+    private var header: some View {
+        HStack {
+            Text("Blackboard")
+                .font(.title)
+            Spacer()
+            Button(action: {
+                isShowingAddBoardView.toggle()
+            }, label: {
+                Image(systemName: "plus")
+                    .font(.system(size: 35))
+                    .foregroundColor(.black)
+                    .background(Color.white)
+            })
+            NavigationLink {
+                MyPageView()
+            } label: {
+                Image(systemName: "person.circle")
+                    .font(.system(size: 35))
+                    .foregroundStyle(.black)
+            }
+        }
+    }
+    
+    private var searchFilterArea: some View {
+        VStack {
+            HStack {
+                TextField("掲示板を検索", text: $searchText)
+                    .padding(10)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.horizontal)
+            }
+            
+            HStack {
+                
+                Spacer()
+                
+                Button(action: {
+                    isSortedByPostCount = false
+                }, label: {
+                    Text("日付順")
+                        .foregroundStyle(isSortedByPostCount ? Color.gray : Color.black)
+                })
+                Text("/")
+                Button(action: {
+                    isSortedByPostCount = true
+                }, label: {
+                    Text("投稿数順")
+                        .foregroundStyle(isSortedByPostCount ? Color.black : Color.gray)
+                })
+            }
+        }
+    }
+    
+    private var boardListArea: some View {
+        ZStack {
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: 16) {
+                    ForEach(filteredBoards) { board in
+                        NavigationLink(destination: BoardView(board: board)) {
+                            VStack {
+                                Text(board.name)
+                                    .font(.headline)
+                                    
+                                Text("投稿数 \(board.postCount)")
+                                    
+                                Text("作成日" + formatDate(board.createDate))
+                                    
+                            }
+                            .foregroundColor(.black)
+                            .frame(width: 150, height: 150)
+                            .background(.green)
+                        }
+                    }
+                }
+                .padding()
+            }
+            .onAppear {
+                boardViewModel.fetchBoards()
+            }     
+        }
+    }
 }

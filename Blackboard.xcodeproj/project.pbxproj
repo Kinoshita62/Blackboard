@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		CE2078C42CAD362A0066B8C1 /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2078C32CAD362A0066B8C1 /* BoardView.swift */; };
 		CE2078C62CAD38D70066B8C1 /* AddBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2078C52CAD38D70066B8C1 /* AddBoardView.swift */; };
+		CE2078C82CB24F770066B8C1 /* EditProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2078C72CB24F760066B8C1 /* EditProfileView.swift */; };
+		CE2078CA2CB28C420066B8C1 /* ColorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2078C92CB28C420066B8C1 /* ColorModel.swift */; };
 		CE9B57372CAA76C500AD7F7D /* BlackboardApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9B57362CAA76C500AD7F7D /* BlackboardApp.swift */; };
 		CE9B57392CAA76C500AD7F7D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9B57382CAA76C500AD7F7D /* ContentView.swift */; };
 		CE9B573B2CAA76C800AD7F7D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE9B573A2CAA76C800AD7F7D /* Assets.xcassets */; };
@@ -19,7 +21,7 @@
 		CE9B575A2CAA7A4A00AD7F7D /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = CE9B57592CAA7A4A00AD7F7D /* FirebaseAuth */; };
 		CE9B575D2CAA83FB00AD7F7D /* InputField.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9B575C2CAA83FB00AD7F7D /* InputField.swift */; };
 		CE9B575F2CAA878C00AD7F7D /* RegistrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9B575E2CAA878C00AD7F7D /* RegistrationView.swift */; };
-		CE9B57612CAA8A5300AD7F7D /* PickerField.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9B57602CAA8A5300AD7F7D /* PickerField.swift */; };
+		CE9B57612CAA8A5300AD7F7D /* PickerComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9B57602CAA8A5300AD7F7D /* PickerComponent.swift */; };
 		CEDE1D1A2CAB9DAF006DD764 /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDE1D192CAB9DAF006DD764 /* UserModel.swift */; };
 		CEDE1D1C2CAB9E3C006DD764 /* MyPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDE1D1B2CAB9E3C006DD764 /* MyPageView.swift */; };
 		CEDE1D1E2CAB9F8F006DD764 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDE1D1D2CAB9F8F006DD764 /* AuthViewModel.swift */; };
@@ -35,6 +37,8 @@
 /* Begin PBXFileReference section */
 		CE2078C32CAD362A0066B8C1 /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardView.swift; sourceTree = "<group>"; };
 		CE2078C52CAD38D70066B8C1 /* AddBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBoardView.swift; sourceTree = "<group>"; };
+		CE2078C72CB24F760066B8C1 /* EditProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileView.swift; sourceTree = "<group>"; };
+		CE2078C92CB28C420066B8C1 /* ColorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorModel.swift; sourceTree = "<group>"; };
 		CE9B57332CAA76C500AD7F7D /* Blackboard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Blackboard.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE9B57362CAA76C500AD7F7D /* BlackboardApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlackboardApp.swift; sourceTree = "<group>"; };
 		CE9B57382CAA76C500AD7F7D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -44,7 +48,7 @@
 		CE9B57572CAA79E400AD7F7D /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		CE9B575C2CAA83FB00AD7F7D /* InputField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputField.swift; sourceTree = "<group>"; };
 		CE9B575E2CAA878C00AD7F7D /* RegistrationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationView.swift; sourceTree = "<group>"; };
-		CE9B57602CAA8A5300AD7F7D /* PickerField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerField.swift; sourceTree = "<group>"; };
+		CE9B57602CAA8A5300AD7F7D /* PickerComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerComponent.swift; sourceTree = "<group>"; };
 		CEDE1D192CAB9DAF006DD764 /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
 		CEDE1D1B2CAB9E3C006DD764 /* MyPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageView.swift; sourceTree = "<group>"; };
 		CEDE1D1D2CAB9F8F006DD764 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
@@ -126,6 +130,7 @@
 				CE9B57572CAA79E400AD7F7D /* LoginView.swift */,
 				CE9B575E2CAA878C00AD7F7D /* RegistrationView.swift */,
 				CEDE1D1B2CAB9E3C006DD764 /* MyPageView.swift */,
+				CE2078C72CB24F760066B8C1 /* EditProfileView.swift */,
 				CE9B575B2CAA83E000AD7F7D /* Components */,
 			);
 			path = Views;
@@ -137,6 +142,7 @@
 				CEDE1D192CAB9DAF006DD764 /* UserModel.swift */,
 				CEDE1D272CAC31C2006DD764 /* BoardModel.swift */,
 				CEDE1D292CAC3450006DD764 /* MessageModel.swift */,
+				CE2078C92CB28C420066B8C1 /* ColorModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -154,7 +160,7 @@
 			isa = PBXGroup;
 			children = (
 				CE9B575C2CAA83FB00AD7F7D /* InputField.swift */,
-				CE9B57602CAA8A5300AD7F7D /* PickerField.swift */,
+				CE9B57602CAA8A5300AD7F7D /* PickerComponent.swift */,
 				CEDE1D212CABB920006DD764 /* BasicButton.swift */,
 				CEDE1D252CAC0154006DD764 /* MyPageRow.swift */,
 			);
@@ -240,7 +246,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CE9B57612CAA8A5300AD7F7D /* PickerField.swift in Sources */,
+				CE2078CA2CB28C420066B8C1 /* ColorModel.swift in Sources */,
+				CE2078C82CB24F770066B8C1 /* EditProfileView.swift in Sources */,
+				CE9B57612CAA8A5300AD7F7D /* PickerComponent.swift in Sources */,
 				CEDE1D1C2CAB9E3C006DD764 /* MyPageView.swift in Sources */,
 				CEDE1D1A2CAB9DAF006DD764 /* UserModel.swift in Sources */,
 				CE9B57582CAA79E400AD7F7D /* LoginView.swift in Sources */,

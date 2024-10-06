@@ -10,7 +10,9 @@ import FirebaseFirestore
 
 struct MessageModel: Identifiable, Codable {
     @DocumentID var id: String?
+    var senderID: String
     var content: String
     var senderName: String
+    var photoUrl: String?
     var timestamp: Date
 }

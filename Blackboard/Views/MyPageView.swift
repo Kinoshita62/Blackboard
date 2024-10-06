@@ -12,6 +12,9 @@ struct MyPageView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     
     @State private var showDeleteAlert = false
+    @State private var showEditProfileView = false
+    
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         VStack {
@@ -33,6 +36,7 @@ struct MyPageView: View {
                         } else {
                             Image(systemName: "person.circle")
                                 .resizable()
+                                .foregroundStyle(.gray)
                                 .aspectRatio(contentMode: .fill)
                                 .frame(width: 48, height: 48)
                                 .clipShape(Circle())
@@ -57,6 +61,14 @@ struct MyPageView: View {
                 
                 Section() {
                     VStack(spacing: 8) {
+                        Button {
+                            showEditProfileView.toggle()
+                        } label: {
+                            MyPageRow(iconName: "square.and.pencil.circle.fill", label: "プロフィール変更", tintColor: .red)
+                        }
+                        
+                        Divider()
+                        
                         Button {
                             authViewModel.logout()
                         } label: {

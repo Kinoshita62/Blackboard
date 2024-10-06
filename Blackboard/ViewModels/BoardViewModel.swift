@@ -53,8 +53,20 @@ class BoardViewModel: ObservableObject {
     }
     
     @MainActor
-    func postMessage(boardId: String, content: String, senderName: String) async {
-        let message = MessageModel(id: nil, content: content, senderName: senderName, timestamp: Date())
+    func postMessage(boardId: String, content: String, senderName: String, authViewModel: AuthViewModel) async {
+        guard let senderID = authViewModel.currentUser?.id else {
+                print("ユーザーがログインしていません")
+                return
+            }
+            
+            // UUIDを使って一意のIDを生成
+            let message = MessageModel(
+                id: UUID().uuidString,
+                senderID: senderID,
+                content: content,
+                senderName: senderName,
+                timestamp: Date()
+            )
         
         do {
             let messageData = try Firestore.Encoder().encode(message)
