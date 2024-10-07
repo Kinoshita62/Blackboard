@@ -59,6 +59,8 @@ class AuthViewModel: ObservableObject {
             let result = try await Auth.auth().signIn(withEmail: email, password: password)
             print("ログイン成功: \(result.user.email)")
             self.userSession = result.user
+            print("\(self.userSession): \(self.userSession?.email)")
+            await self.fetchCurrentUser()
         } catch {
             print("ログイン失敗: \(error.localizedDescription)")
         }
@@ -154,6 +156,7 @@ class AuthViewModel: ObservableObject {
         }
     }
     
+    @MainActor
     private func uploadImage() async -> String? {
         let filename = NSUUID().uuidString
         let storageRef = Storage.storage().reference(withPath: "/user_images/\(filename)")

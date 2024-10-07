@@ -53,7 +53,7 @@ struct MyPageView: View {
                 NavigationLink(destination: EditProfileView()) {
                     MyPageRow(iconName: "square.and.pencil.circle.fill", label: "プロフィール変更", tintColor: .red)
                 }
-                        
+                
                 Button {
                     authViewModel.logout()
                 } label: {

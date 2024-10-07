@@ -14,28 +14,12 @@ struct MainView: View {
     @State private var isShowingAddBoardView = false
     @State private var searchText = ""
     @State private var isSortedByPostCount = false
+    @State private var filteredBoards = [BoardModel]()
     
     let columns: [GridItem] = [
         GridItem(.flexible(), spacing: 16),
         GridItem(.flexible(), spacing: 16)
     ]
-    
-    
-    var filteredBoards: [BoardModel] {
-        let boards: [BoardModel] //元データはそのままに
-            
-        if searchText.isEmpty {
-            boards = boardViewModel.boards
-        } else {
-            boards = boardViewModel.boards.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
-        }
-        
-        if isSortedByPostCount {
-            return boards.sorted { $0.postCount > $1.postCount }
-        } else {
-            return boards.sorted { $0.createDate > $1.createDate }
-        }
-    }
     
     var body: some View {
         NavigationStack {
@@ -44,25 +28,28 @@ struct MainView: View {
                 
                 searchFilterArea
                 
-                if boardViewModel.isLoading {
-                    VStack {
-                        ProgressView()
-                        Spacer()
-                    }
-                    
-                } else {
-                    boardListArea
-                }
-                
+                boardListArea
                 
             }
             .padding(.horizontal)
             .sheet(isPresented: $isShowingAddBoardView) {
-                AddBoardView(boardViewModel: boardViewModel, isShowingAddBoardView: $isShowingAddBoardView)
-                    .presentationDragIndicator(.visible)
+                AddBoardView(boardViewModel: boardViewModel, isShowingAddBoardView: $isShowingAddBoardView, onAddCompletion: {
+                    // 掲示板が追加された後にリストを更新する
+                    boardViewModel.fetchBoards {
+                        // fetchBoardsの完了後にフィルタリングを行う
+                        self.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
+                    }
+                })
+                
+                .presentationDragIndicator(.visible)
             }
             .onAppear {
-                boardViewModel.fetchBoards()
+                if let _ = authViewModel.userSession {
+                    boardViewModel.fetchBoards {
+                        // fetchBoardsの完了後にフィルタリングを行う
+                        self.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
+                    }
+                }
             }
         }
     }
@@ -100,44 +87,44 @@ extension MainView {
             } label: {
                 if let urlString = authViewModel.currentUser?.photoUrl, let url = URL(string: urlString) {
                     AsyncImage(url: url) { phase in
-                                        switch phase {
-                                        case .empty:
-                                            Image(systemName: "person.circle")
-                                                .resizable()
-                                                .foregroundStyle(.gray)
-                                                .aspectRatio(contentMode: .fill)
-                                                .frame(width: 35, height: 35)
-                                                .clipShape(Circle())
-                                        case .success(let image):
-                                            image
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fill)
-                                                .frame(width: 35, height: 35)
-                                                .clipShape(Circle())
-                                        case .failure:
-                                            Image(systemName: "person.circle")
-                                                .resizable()
-                                                .foregroundStyle(.gray)
-                                                .aspectRatio(contentMode: .fill)
-                                                .frame(width: 35, height: 35)
-                                                .clipShape(Circle())
-                                        @unknown default:
-                                            Image(systemName: "person.circle")
-                                                .resizable()
-                                                .foregroundStyle(.gray)
-                                                .aspectRatio(contentMode: .fill)
-                                                .frame(width: 35, height: 35)
-                                                .clipShape(Circle())
-                                        }
-                                    }
-                                } else {
-                                    Image(systemName: "person.circle")
-                                        .resizable()
-                                        .foregroundStyle(.gray)
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 35, height: 35)
-                                        .clipShape(Circle())
-                                }
+                        switch phase {
+                        case .empty:
+                            Image(systemName: "person.circle")
+                                .resizable()
+                                .foregroundStyle(.gray)
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 35, height: 35)
+                                .clipShape(Circle())
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 35, height: 35)
+                                .clipShape(Circle())
+                        case .failure:
+                            Image(systemName: "person.circle")
+                                .resizable()
+                                .foregroundStyle(.gray)
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 35, height: 35)
+                                .clipShape(Circle())
+                        @unknown default:
+                            Image(systemName: "person.circle")
+                                .resizable()
+                                .foregroundStyle(.gray)
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 35, height: 35)
+                                .clipShape(Circle())
+                        }
+                    }
+                } else {
+                    Image(systemName: "person.circle")
+                        .resizable()
+                        .foregroundStyle(.gray)
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 35, height: 35)
+                        .clipShape(Circle())
+                }
             }
         }
     }
@@ -149,6 +136,10 @@ extension MainView {
                     .padding(10)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.horizontal)
+                    .onChange(of: searchText) {
+                        
+                        self.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
+                    }
             }
             
             HStack {
@@ -157,6 +148,7 @@ extension MainView {
                 
                 Button(action: {
                     isSortedByPostCount = false
+                    self.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
                 }, label: {
                     Text("日付順")
                         .foregroundStyle(isSortedByPostCount ? Color.gray : Color.black)
@@ -164,6 +156,7 @@ extension MainView {
                 Text("/")
                 Button(action: {
                     isSortedByPostCount = true
+                    self.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
                 }, label: {
                     Text("投稿数順")
                         .foregroundStyle(isSortedByPostCount ? Color.black : Color.gray)
@@ -186,7 +179,7 @@ extension MainView {
                                 Spacer()
                                 Text("作成日" + formatDate(board.createDate))
                                     .padding(.bottom)
-                                    
+                                
                             }
                             .foregroundColor(.black)
                             .frame(width: 150, height: 150)
@@ -196,9 +189,6 @@ extension MainView {
                 }
                 .padding()
             }
-            .onAppear {
-                boardViewModel.fetchBoards()
-            }     
         }
     }
 }

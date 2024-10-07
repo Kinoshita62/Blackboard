@@ -13,6 +13,7 @@ struct AddBoardView: View {
     @Environment(\.dismiss) var dismiss
     @State private var boardName: String = ""
     @Binding var isShowingAddBoardView: Bool
+    var onAddCompletion: () -> Void // 完了クロージャ
     
     var body: some View {
         VStack {
@@ -25,8 +26,10 @@ struct AddBoardView: View {
             Button(action: {
                 if !boardName.isEmpty && boardName.count < 11 {
                     Task {
-                        await boardViewModel.addBoard(name: boardName)
-                        dismiss()
+                        await boardViewModel.addBoard(name: boardName) {
+                            onAddCompletion()
+                            dismiss()
+                        }
                     }
                     isShowingAddBoardView = false
                 }
@@ -49,5 +52,5 @@ struct AddBoardView: View {
 }
 
 #Preview {
-    AddBoardView(boardViewModel: BoardViewModel(), isShowingAddBoardView: .constant(true))
+    AddBoardView(boardViewModel: BoardViewModel(), isShowingAddBoardView: .constant(true), onAddCompletion: {})
 }

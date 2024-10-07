@@ -31,7 +31,7 @@ struct LoginView: View {
                     InputField(text: $email, label: "メールアドレス", placeholder: "入力してください", keyboardType: .emailAddress)
                     
                     InputField(text: $password, label: "パスワード", placeholder: "半角英数字6文字以上", isSecureField: true)
-
+                    
                     BasicButton(label: "ログイン", icon: "arrow.right") {
                         Task {
                             await authViewModel.login(email: email, password: password)

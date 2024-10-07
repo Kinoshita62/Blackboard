@@ -59,8 +59,8 @@ extension BoardView {
                                     .background(.white)
                                     .cornerRadius(8)
                                 Text(formatDate(message.timestamp))
-                                .font(.system(size: 15))
-                                .foregroundColor(.black)
+                                    .font(.system(size: 15))
+                                    .foregroundColor(.black)
                                 Spacer()
                             } else {
                                 Spacer()
