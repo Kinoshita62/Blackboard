@@ -51,53 +51,30 @@ extension BoardView {
                 VStack(alignment: .leading, spacing: 10) {
                     ForEach(boardViewModel.messages) { message in
                         HStack {
-                            if message.senderName != authViewModel.currentUser?.name {
-                                if let urlString = authViewModel.currentUser?.photoUrl, let url = URL(string: urlString) {
-                                    AsyncImage(url: url) { image in
-                                        image
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fill)
-                                            .frame(width: 48, height: 48)
-                                            .clipShape(Circle())
-                                    } placeholder: {
-                                        ProgressView()
-                                            .frame(width: 48, height: 48 )
-                                    }
-                                } else {
-                                    Image(systemName: "person.circle")
-                                        .resizable()
-                                        .foregroundStyle(.gray)
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 48, height: 48)
-                                        .clipShape(Circle())
-                                }
+                            if message.senderID != authViewModel.currentUser?.id {
+                                senderImageView(senderPhotoUrl: message.senderPhotoUrl)
                                 Text(message.content)
                                     .font(.body)
                                     .padding(5)
                                     .background(.white)
                                     .cornerRadius(8)
-                                VStack {
-                                    Text(formatDate(message.timestamp))
-                                    
-                                    Text(message.senderName)
-                                    
-                                }
+                                Text(formatDate(message.timestamp))
                                 .font(.system(size: 15))
                                 .foregroundColor(.black)
                                 Spacer()
                             } else {
                                 Spacer()
+                                
+                                
+                                Text(formatDate(message.timestamp))
+                                    .font(.system(size: 15))
+                                    .foregroundColor(.black)
                                 Text(message.content)
                                     .font(.body)
                                     .padding(5)
                                     .background(.white)
                                     .cornerRadius(8)
-                                VStack {
-                                    Text(formatDate(message.timestamp))
-                                    Text(message.senderName)
-                                }
-                                .font(.system(size: 15))
-                                .foregroundColor(.black)
+                                senderImageView(senderPhotoUrl: message.senderPhotoUrl)
                             }
                         }
                     }

@@ -5,6 +5,7 @@
 //  Created by USER on 2024/10/01.
 //
 
+import SwiftUI
 import Foundation
 import Firebase
 import FirebaseFirestore
@@ -12,20 +13,23 @@ import FirebaseFirestore
 class BoardViewModel: ObservableObject {
     @Published var boards = [BoardModel]()
     @Published var messages = [MessageModel]()
+    @Published var isLoading = true
     
     @MainActor
     func fetchBoards() {
-        Firestore.firestore().collection("boards").addSnapshotListener { (querySnapshot, error) in
+        Firestore.firestore().collection("boards").getDocuments { (querySnapshot, error) in
             if let error = error {
                 print("エラーが発生しました: \(error.localizedDescription)")
+                self.isLoading = false
                 return
             }
-            
+
             guard let documents = querySnapshot?.documents else {
                 print("ドキュメントが見つかりません")
+                self.isLoading = false
                 return
             }
-            
+
             self.boards = documents.compactMap { queryDocumentSnapshot in
                 do {
                     var board = try queryDocumentSnapshot.data(as: BoardModel.self)
@@ -35,18 +39,19 @@ class BoardViewModel: ObservableObject {
                             print("投稿数の取得に失敗しました: \(error.localizedDescription)")
                             return
                         }
-            
+                        
                         board.postCount = snapshot?.documents.count ?? 0
                         DispatchQueue.main.async {
                             if let index = self.boards.firstIndex(where: { $0.id == boardId }) {
                                 self.boards[index] = board
                             }
+                            self.isLoading = false
                         }
                     }
                     return board
                 } catch {
                     print("データのデコードに失敗しました: \(error.localizedDescription)")
-                        return nil
+                    return nil
                 }
             }
         }
@@ -58,13 +63,14 @@ class BoardViewModel: ObservableObject {
                 print("ユーザーがログインしていません")
                 return
             }
-            
+        let senderPhotoUrl = authViewModel.currentUser?.photoUrl
             // UUIDを使って一意のIDを生成
             let message = MessageModel(
                 id: UUID().uuidString,
                 senderID: senderID,
                 content: content,
                 senderName: senderName,
+                senderPhotoUrl: senderPhotoUrl,
                 timestamp: Date()
             )
         
@@ -108,5 +114,16 @@ class BoardViewModel: ObservableObject {
                         try? queryDocumentSnapshot.data(as: MessageModel.self)
                     }
                 }
+        }
+    func scrollToLast(proxy: ScrollViewProxy, smooth: Bool = false) {
+            if let lastMessage = messages.last {
+                if smooth {
+                    withAnimation(.easeInOut) {
+                        proxy.scrollTo(lastMessage.id, anchor: .bottom)
+                    }
+                } else {
+                    proxy.scrollTo(lastMessage.id, anchor: .bottom)
+                }
+            }
         }
 }

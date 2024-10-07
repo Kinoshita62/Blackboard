@@ -35,7 +35,7 @@ struct RegistrationView: View {
             }
             
             VStack(spacing: 24) {
-                InputField(text: $email, label: "メールアドレス", placeholder: "入力してください", keyboardType: .emailAddress)
+                InputField(text: $email, label: "メールアドレス", placeholder: "入力してください")
                 
                 InputField(text: $name, label: "お名前 (8文字以内)", placeholder: "入力してください")
                 

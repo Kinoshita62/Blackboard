@@ -2,7 +2,7 @@
 //  EditProfileView.swift
 //  Blackboard
 //
-//  Created by USER on 2024/10/06.
+//  Created by USER on 2024/10/07.
 //
 
 import SwiftUI
@@ -13,8 +13,8 @@ struct EditProfileView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     
     @State var name = ""
-    @State private var age: AgeGroup = .teens
-    @State private var sex: Gender = .male
+    @State var age: AgeGroup = .teens
+    @State var sex: Gender = .male
     @State var message = ""
     
     @Environment(\.dismiss) var dismiss
@@ -29,15 +29,18 @@ struct EditProfileView: View {
             .navigationTitle("プロフィール変更")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .topBarLeading) {
                     Button("キャンセル") {
                         dismiss()
                     }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button("変更") {
                         Task {
-                            guard let currentUser = authViewModel.currentUser else { return }
+                            guard let currentUser = authViewModel.currentUser else {
+                                print("カレントユーザーが見つかりません")
+                                return
+                            }
                             await authViewModel.updateUserProfile(
                                 withID: currentUser.id,
                                 name: name,
@@ -64,35 +67,39 @@ struct EditProfileView_Previews: PreviewProvider {
 
 extension EditProfileView {
     private var editField: some View {
-        VStack {
+        VStack(spacing: 16) {
+            //PhotoPicker
             PhotosPicker(selection: $authViewModel.selectedImage) {
                 Group {
                     if let uiImage = authViewModel.profileImage {
                         Image(uiImage: uiImage)
                             .resizable()
-                            .scaledToFit()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 48, height: 48)
                             .clipShape(Circle())
-                            .frame(width: 200, height: 200)
                     } else if let urlString = authViewModel.currentUser?.photoUrl, let url = URL(string: urlString) {
                         AsyncImage(url: url) { image in
                             image
                                 .resizable()
-                                .scaledToFit()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 48, height: 48)
                                 .clipShape(Circle())
-                                .frame(width: 200, height: 200)
                         } placeholder: {
                             ProgressView()
-                                .frame(width: 200, height: 200)
+                                .frame(width: 48, height: 48 )
                         }
                     } else {
                         Image(systemName: "person.circle")
-                            .font(.system(size: 100))
+                            .resizable()
                             .foregroundStyle(.gray)
-                        
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 48, height: 48)
+                            .clipShape(Circle())
                     }
                 }
-                
             }
+            
+            //InputField
             InputField(text: $name, label: "お名前", placeholder: "")
             PickerComponent(title: "年齢", selection: $age)
             PickerComponent(title: "性別", selection: $sex)
@@ -113,6 +120,10 @@ extension EditProfileView {
                 age = currentUser.age
                 sex = currentUser.sex
                 message = currentUser.message ?? ""
+            } else {
+                Task {
+                    await authViewModel.fetchCurrentUser()
+                }
             }
         }
     }

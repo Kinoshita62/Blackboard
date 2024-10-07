@@ -8,11 +8,11 @@
 import Foundation
 import FirebaseFirestore
 
-struct MessageModel: Identifiable, Codable {
+struct MessageModel: Identifiable, Codable, Equatable {
     @DocumentID var id: String?
     var senderID: String
     var content: String
     var senderName: String
-    var photoUrl: String?
+    var senderPhotoUrl: String?
     var timestamp: Date
 }

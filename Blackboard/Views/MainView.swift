@@ -43,13 +43,26 @@ struct MainView: View {
                 header
                 
                 searchFilterArea
-            
-                boardListArea
+                
+                if boardViewModel.isLoading {
+                    VStack {
+                        ProgressView()
+                        Spacer()
+                    }
+                    
+                } else {
+                    boardListArea
+                }
+                
+                
             }
             .padding(.horizontal)
             .sheet(isPresented: $isShowingAddBoardView) {
                 AddBoardView(boardViewModel: boardViewModel, isShowingAddBoardView: $isShowingAddBoardView)
                     .presentationDragIndicator(.visible)
+            }
+            .onAppear {
+                boardViewModel.fetchBoards()
             }
         }
     }
@@ -85,9 +98,46 @@ extension MainView {
             NavigationLink {
                 MyPageView()
             } label: {
-                Image(systemName: "person.circle")
-                    .font(.system(size: 35))
-                    .foregroundStyle(.black)
+                if let urlString = authViewModel.currentUser?.photoUrl, let url = URL(string: urlString) {
+                    AsyncImage(url: url) { phase in
+                                        switch phase {
+                                        case .empty:
+                                            Image(systemName: "person.circle")
+                                                .resizable()
+                                                .foregroundStyle(.gray)
+                                                .aspectRatio(contentMode: .fill)
+                                                .frame(width: 35, height: 35)
+                                                .clipShape(Circle())
+                                        case .success(let image):
+                                            image
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fill)
+                                                .frame(width: 35, height: 35)
+                                                .clipShape(Circle())
+                                        case .failure:
+                                            Image(systemName: "person.circle")
+                                                .resizable()
+                                                .foregroundStyle(.gray)
+                                                .aspectRatio(contentMode: .fill)
+                                                .frame(width: 35, height: 35)
+                                                .clipShape(Circle())
+                                        @unknown default:
+                                            Image(systemName: "person.circle")
+                                                .resizable()
+                                                .foregroundStyle(.gray)
+                                                .aspectRatio(contentMode: .fill)
+                                                .frame(width: 35, height: 35)
+                                                .clipShape(Circle())
+                                        }
+                                    }
+                                } else {
+                                    Image(systemName: "person.circle")
+                                        .resizable()
+                                        .foregroundStyle(.gray)
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 35, height: 35)
+                                        .clipShape(Circle())
+                                }
             }
         }
     }
@@ -131,10 +181,11 @@ extension MainView {
                             VStack {
                                 Text(board.name)
                                     .font(.headline)
-                                    
+                                    .padding(.top, 40)
                                 Text("投稿数 \(board.postCount)")
-                                    
+                                Spacer()
                                 Text("作成日" + formatDate(board.createDate))
+                                    .padding(.bottom)
                                     
                             }
                             .foregroundColor(.black)

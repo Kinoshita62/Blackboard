@@ -50,6 +50,7 @@ class AuthViewModel: ObservableObject {
     func resetAccount() {
         self.userSession = nil
         self.currentUser = nil
+        self.profileImage = nil
     }
     
     @MainActor
@@ -57,11 +58,7 @@ class AuthViewModel: ObservableObject {
         do {
             let result = try await Auth.auth().signIn(withEmail: email, password: password)
             print("ログイン成功: \(result.user.email)")
-            DispatchQueue.main.async {
-                self.userSession = result.user
-            }
-            print("\(self.userSession): \(self.userSession?.email)")
-            await self.fetchCurrentUser()
+            self.userSession = result.user
         } catch {
             print("ログイン失敗: \(error.localizedDescription)")
         }
@@ -80,15 +77,19 @@ class AuthViewModel: ObservableObject {
     
     @MainActor
     func fetchCurrentUser() async {
+        guard let uid = self.userSession?.uid else {
+            print("ユーザーのUIDが見つかりません")
+            return
+        }
         
-        guard let uid = self.userSession?.uid else { return }
         do {
             let snapshot = try await Firestore.firestore().collection("users").document(uid).getDocument()
-            let user = try snapshot.data(as: UserModel.self)
-            DispatchQueue.main.async {
-                self.currentUser = user
+            if let data = snapshot.data() {
+                self.currentUser = try snapshot.data(as: UserModel.self)
+                print("カレントユーザー取得成功: \(self.currentUser?.name ?? "名前なし")")
+            } else {
+                print("ユーザーのドキュメントが見つかりません: UID = \(uid)")
             }
-            print("カレントユーザー取得成功: \(self.currentUser)")
         } catch {
             print("カレントユーザー取得失敗: \(error.localizedDescription)")
         }
@@ -135,8 +136,8 @@ class AuthViewModel: ObservableObject {
     func updateUserProfile(withID id: String, name: String, age: AgeGroup, sex: Gender, message: String)  async {
         var data: [AnyHashable: Any] = [
             "name": name,
-            "age": age,
-            "sex": sex,
+            "age": age.rawValue,
+            "sex": sex.rawValue,
             "message": message
         ]
         
