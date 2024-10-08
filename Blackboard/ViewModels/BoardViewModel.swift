@@ -13,6 +13,7 @@ import FirebaseFirestore
 class BoardViewModel: ObservableObject {
     @Published var boards = [BoardModel]()
     @Published var messages = [MessageModel]()
+    @Published var filteredBoards = [BoardModel] ()
     
     @MainActor
     func fetchBoards(completion: @escaping () -> Void) {

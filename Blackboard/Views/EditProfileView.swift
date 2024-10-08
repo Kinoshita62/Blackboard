@@ -28,6 +28,7 @@ struct EditProfileView: View {
             }
             .navigationTitle("プロフィール変更")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("キャンセル") {
@@ -75,18 +76,18 @@ extension EditProfileView {
                         Image(uiImage: uiImage)
                             .resizable()
                             .aspectRatio(contentMode: .fill)
-                            .frame(width: 48, height: 48)
+                            .frame(width: 120, height: 120)
                             .clipShape(Circle())
                     } else if let urlString = authViewModel.currentUser?.photoUrl, let url = URL(string: urlString) {
                         AsyncImage(url: url) { image in
                             image
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
-                                .frame(width: 48, height: 48)
+                                .frame(width: 120, height: 120)
                                 .clipShape(Circle())
                         } placeholder: {
                             ProgressView()
-                                .frame(width: 48, height: 48 )
+                                .frame(width: 120, height: 120 )
                         }
                     } else {
                         Image(systemName: "person.circle")

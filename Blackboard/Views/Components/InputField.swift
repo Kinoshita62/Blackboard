@@ -18,7 +18,6 @@ struct InputField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(label)
-                .foregroundStyle(Color(.gray))
                 .fontWeight(.semibold)
                 .font(.footnote)
             if isSecureField {

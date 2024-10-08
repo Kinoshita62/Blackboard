@@ -14,11 +14,10 @@ struct MainView: View {
     @State private var isShowingAddBoardView = false
     @State private var searchText = ""
     @State private var isSortedByPostCount = false
-    @State private var filteredBoards = [BoardModel]()
     
     let columns: [GridItem] = [
-        GridItem(.flexible(), spacing: 16),
-        GridItem(.flexible(), spacing: 16)
+        GridItem(spacing: 8),
+        GridItem(spacing: 8)
     ]
     
     var body: some View {
@@ -34,10 +33,8 @@ struct MainView: View {
             .padding(.horizontal)
             .sheet(isPresented: $isShowingAddBoardView) {
                 AddBoardView(boardViewModel: boardViewModel, isShowingAddBoardView: $isShowingAddBoardView, onAddCompletion: {
-                    // 掲示板が追加された後にリストを更新する
                     boardViewModel.fetchBoards {
-                        // fetchBoardsの完了後にフィルタリングを行う
-                        self.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
+                        boardViewModel.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
                     }
                 })
                 
@@ -46,20 +43,11 @@ struct MainView: View {
             .onAppear {
                 if let _ = authViewModel.userSession {
                     boardViewModel.fetchBoards {
-                        // fetchBoardsの完了後にフィルタリングを行う
-                        self.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
+                        boardViewModel.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
                     }
                 }
             }
         }
-    }
-    
-    private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ja_JP")
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .none
-        return formatter.string(from: date)
     }
 }
 
@@ -87,43 +75,18 @@ extension MainView {
             } label: {
                 if let urlString = authViewModel.currentUser?.photoUrl, let url = URL(string: urlString) {
                     AsyncImage(url: url) { phase in
-                        switch phase {
-                        case .empty:
-                            Image(systemName: "person.circle")
-                                .resizable()
-                                .foregroundStyle(.gray)
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 35, height: 35)
-                                .clipShape(Circle())
-                        case .success(let image):
+                        if case .success(let image) = phase {
                             image
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
                                 .frame(width: 35, height: 35)
                                 .clipShape(Circle())
-                        case .failure:
-                            Image(systemName: "person.circle")
-                                .resizable()
-                                .foregroundStyle(.gray)
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 35, height: 35)
-                                .clipShape(Circle())
-                        @unknown default:
-                            Image(systemName: "person.circle")
-                                .resizable()
-                                .foregroundStyle(.gray)
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 35, height: 35)
-                                .clipShape(Circle())
+                        } else {
+                            DefaultImageIcon()
                         }
                     }
                 } else {
-                    Image(systemName: "person.circle")
-                        .resizable()
-                        .foregroundStyle(.gray)
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 35, height: 35)
-                        .clipShape(Circle())
+                    DefaultImageIcon()
                 }
             }
         }
@@ -137,18 +100,15 @@ extension MainView {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.horizontal)
                     .onChange(of: searchText) {
-                        
-                        self.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
+                        boardViewModel.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
                     }
             }
             
             HStack {
-                
                 Spacer()
-                
                 Button(action: {
                     isSortedByPostCount = false
-                    self.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
+                    boardViewModel.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
                 }, label: {
                     Text("日付順")
                         .foregroundStyle(isSortedByPostCount ? Color.gray : Color.black)
@@ -156,7 +116,7 @@ extension MainView {
                 Text("/")
                 Button(action: {
                     isSortedByPostCount = true
-                    self.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
+                    boardViewModel.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
                 }, label: {
                     Text("投稿数順")
                         .foregroundStyle(isSortedByPostCount ? Color.black : Color.gray)
@@ -169,7 +129,7 @@ extension MainView {
         ZStack {
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(filteredBoards) { board in
+                    ForEach(boardViewModel.filteredBoards) { board in
                         NavigationLink(destination: BoardView(board: board)) {
                             VStack {
                                 Text(board.name)
@@ -177,7 +137,7 @@ extension MainView {
                                     .padding(.top, 40)
                                 Text("投稿数 \(board.postCount)")
                                 Spacer()
-                                Text("作成日" + formatDate(board.createDate))
+                                Text("作成日" + DateFormatterUtility.formatDate(board.createDate))
                                     .padding(.bottom)
                                 
                             }
@@ -187,7 +147,6 @@ extension MainView {
                         }
                     }
                 }
-                .padding()
             }
         }
     }

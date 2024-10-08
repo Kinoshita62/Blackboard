@@ -9,12 +9,11 @@ import SwiftUI
 struct PickerComponent<T: Hashable & CaseIterable & RawRepresentable>: View where T.AllCases: RandomAccessCollection, T.RawValue == String {
     let title: String
     @Binding var selection: T
-
+    
     var body: some View {
         
         HStack {
             Text(title)
-                .foregroundStyle(Color(.gray))
                 .fontWeight(.semibold)
                 .font(.footnote)
             Spacer()
