@@ -56,7 +56,7 @@ class AuthViewModel: ObservableObject {
     @MainActor
     func login(email: String, password: String) async {
         do {
-            let result = try await Auth.auth().signIn(withEmail: email, password: password)
+            let result = try await Auth.auth().signIn(withEmail: email, password: password) //AuthDataResult型で取得
             print("ログイン成功: \(result.user.email)")
             self.userSession = result.user
             print("\(self.userSession): \(self.userSession?.email)")
@@ -86,8 +86,8 @@ class AuthViewModel: ObservableObject {
         
         do {
             let snapshot = try await Firestore.firestore().collection("users").document(uid).getDocument()
-            if let data = snapshot.data() {
-                self.currentUser = try snapshot.data(as: UserModel.self)
+            if let data = snapshot.data() { //[String: Any]?型で取得
+                self.currentUser = try snapshot.data(as: UserModel.self) //UserModel型にデコード
                 print("カレントユーザー取得成功: \(self.currentUser?.name ?? "名前なし")")
             } else {
                 print("ユーザーのドキュメントが見つかりません: UID = \(uid)")
@@ -99,22 +99,20 @@ class AuthViewModel: ObservableObject {
     
     @MainActor
     func uploadUserData(withUser user: UserModel) async {
-        
         do {
-            let userData = try Firestore.Encoder().encode(user)
+            let userData = try Firestore.Encoder().encode(user) //Firestoreに適した形式にエンコード
             try await Firestore.firestore().collection("users").document(user.id).setData(userData)
             print("データ保存成功")
         } catch {
             print("データ保存失敗: \(error.localizedDescription)")
         }
-        
     }
     
     @MainActor
     func deleteAccount() async {
         guard let id = self.currentUser?.id else { return }
         do {
-            try await Auth.auth().currentUser?.delete()
+            try await Auth.auth().currentUser?.delete() //currentUserはFirestoreに保存されているが、パスワード等の認証情報は削除可能
             try await Firestore.firestore().collection("users").document(id).delete()
             self.resetAccount()
             print("アカウント削除")
@@ -125,17 +123,16 @@ class AuthViewModel: ObservableObject {
     
     @MainActor
     private func loadImage() async {
-        guard let image = selectedImage else { return }
+        guard let image = selectedImage else { return } //PhotosPickerItem? → PhotosPickerItem
         do {
-            guard let data = try await image.loadTransferable(type: Data.self) else { return }
-            self.profileImage = UIImage(data: data)
+            guard let data = try await image.loadTransferable(type: Data.self) else { return } //PhotosPickerItem → Data
+            self.profileImage = UIImage(data: data) //Data → UIImage
         } catch {
             print("参照データロード失敗: \(error.localizedDescription)")
         }
-        
     }
     
-    func updateUserProfile(withID id: String, name: String, age: AgeGroup, sex: Gender, message: String)  async {
+    func updateUserProfile(withID id: String, name: String, age: AgeGroup, sex: Gender, message: String) async {
         var data: [AnyHashable: Any] = [
             "name": name,
             "age": age.rawValue,

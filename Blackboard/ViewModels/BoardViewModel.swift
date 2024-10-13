@@ -36,7 +36,7 @@ class BoardViewModel: ObservableObject {
                     do {
                         var board = try document.data(as: BoardModel.self)
                         let boardId = document.documentID
-                        let snapshot = try await Firestore.firestore().collection("boards").document(boardId).collection("messages").getDocuments()
+                        let snapshot = try await Firestore.firestore().collection("boards").document(boardId).collection("messages").getDocuments() //サブコレクションからの取得
                         
                         board.postCount = snapshot.documents.count
                         updatedBoards.append(board)
@@ -62,13 +62,13 @@ class BoardViewModel: ObservableObject {
         let senderPhotoUrl = authViewModel.currentUser?.photoUrl
         // UUIDを使って一意のIDを生成
         let message = MessageModel(
-            id: UUID().uuidString,
-            senderID: senderID,
-            content: content,
-            senderName: senderName,
-            senderPhotoUrl: senderPhotoUrl,
-            timestamp: Date()
-        )
+                id: UUID().uuidString,
+                senderID: senderID,
+                content: content,
+                senderName: senderName,
+                senderPhotoUrl: senderPhotoUrl,
+                timestamp: Date()
+            )
         
         do {
             let messageData = try Firestore.Encoder().encode(message)
@@ -80,12 +80,20 @@ class BoardViewModel: ObservableObject {
     }
     
     @MainActor
-    func addBoard(name: String, completion: @escaping () -> Void) async {
-        let newBoard = BoardModel(id: nil, name: name, createDate: Date(), postCount: 0)
+    func addBoard(name: String, authViewModel: AuthViewModel, completion: @escaping () -> Void) async {
+        guard let creatorID = authViewModel.currentUser?.id else {
+                print("ユーザーがログインしていません")
+                return
+            }
+        let newBoard = BoardModel(id: nil, name: name, createDate: Date(), postCount: 0, creatorID: creatorID)
         do {
-            let boardData = try Firestore.Encoder().encode(newBoard)
-            try await Firestore.firestore().collection("boards").addDocument(data: boardData)
-            print("掲示板追加成功")
+            let ref = try await Firestore.firestore().collection("boards").addDocument(from: newBoard)
+            let documentID = ref.documentID
+                    print("新しい掲示板ID: \(documentID)")
+                    
+                    // 必要に応じてIDを設定したBoardModelを保存するか、必要な処理を行う
+                    var updatedBoard = newBoard
+                    updatedBoard.id = documentID
             fetchBoards {
                 completion()
             }
@@ -97,7 +105,7 @@ class BoardViewModel: ObservableObject {
     @MainActor
     func fetchMessages(boardId: String) {
         Firestore.firestore().collection("boards").document(boardId).collection("messages")
-            .order(by: "timestamp", descending: false)
+            .order(by: "timestamp", descending: false) //古い順に並べる
             .addSnapshotListener { (querySnapshot, error) in
                 if let error = error {
                     print("メッセージの取得に失敗しました: \(error.localizedDescription)")
@@ -117,7 +125,7 @@ class BoardViewModel: ObservableObject {
     
     func getFilteredBoards(searchText: String, isSortedByPostCount: Bool) -> [BoardModel] {
         
-        var boards: [BoardModel] = self.boards
+        var boards: [BoardModel] = self.boards //self.boardsは共有データのため、コピーをローカル変数として定義
         
         if !searchText.isEmpty {
             boards = boards.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
@@ -127,6 +135,45 @@ class BoardViewModel: ObservableObject {
             return boards.sorted { $0.postCount > $1.postCount }
         } else {
             return boards.sorted { $0.createDate > $1.createDate }
+        }
+    }
+    
+    @MainActor
+    func deleteBoard(boardId: String, creatorID: String, authViewModel: AuthViewModel, completion: @escaping () -> Void) async {
+        guard let currentUserID = authViewModel.currentUser?.id else {
+            print("ユーザーがログインしていません")
+            return
+        }
+        if currentUserID != creatorID {
+            print("掲示板の作成者のみが削除できます")
+            return
+        }
+        do {
+            try await Firestore.firestore().collection("boards").document(boardId).delete()
+            print("掲示板削除成功")
+            fetchBoards {
+                completion()
+            }
+        } catch {
+            print("掲示板削除失敗: \(error.localizedDescription)")
+        }
+    }
+    
+    @MainActor
+    func deleteMessage(boardId: String, messageId: String, senderID: String, authViewModel: AuthViewModel) async {
+        guard let currentUserID = authViewModel.currentUser?.id else {
+            print("ユーザーがログインしていません")
+            return
+        }
+        if currentUserID != senderID {
+            print("メッセージの送信者のみが削除できます")
+            return
+        }
+        do {
+            try await Firestore.firestore().collection("boards").document(boardId).collection("messages").document(messageId).delete()
+            print("メッセージ削除成功")
+        } catch {
+            print("メッセージ削除失敗: \(error.localizedDescription)")
         }
     }
 }

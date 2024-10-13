@@ -10,6 +10,7 @@ import SwiftUI
 struct AddBoardView: View {
     
     @ObservedObject var boardViewModel: BoardViewModel
+    @EnvironmentObject var authViewModel: AuthViewModel
     @Environment(\.dismiss) var dismiss
     @State private var boardName: String = ""
     @Binding var isShowingAddBoardView: Bool
@@ -53,7 +54,7 @@ extension AddBoardView {
         Button(action: {
             if !boardName.isEmpty && boardName.count < 11 {
                 Task {
-                    await boardViewModel.addBoard(name: boardName) {
+                    await boardViewModel.addBoard(name: boardName, authViewModel: authViewModel) {
                         onAddCompletion()
                         dismiss()
                     }

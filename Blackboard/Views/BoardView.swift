@@ -68,7 +68,7 @@ struct BoardView: View {
 }
 
 #Preview {
-    BoardView(board: BoardModel(id: "sampleID", name: "Sample Board", createDate: Date(), postCount: 0))
+    BoardView(board: BoardModel(id: "sampleID", name: "Sample Board", createDate: Date(), postCount: 0, creatorID: "sampleID"))
         .environmentObject(AuthViewModel())
 }
 
@@ -84,7 +84,11 @@ extension BoardView {
                     }
                 }
                 .onAppear {
-                    boardViewModel.fetchMessages(boardId: board.id ?? "")
+                    guard let boardId = board.id else {
+                        print("BoardID is nil, cannot fetch messages.")
+                        return
+                    }
+                    boardViewModel.fetchMessages(boardId: boardId)
                     scrollToLastMessage(proxy: proxy)
                 }
                 .onChange(of: boardViewModel.messages.count) {
@@ -145,17 +149,27 @@ extension BoardView {
                 Spacer()
             } else {
                 Spacer()
-                VStack {
-                    Spacer()
+              
                     Text(DateFormatterUtility.formatDate(message.timestamp))
                         .font(.system(size: 10))
                         .foregroundColor(.black)
-                }
+                    
+                
                 Text(message.content)
                     .font(.body)
                     .padding(5)
                     .background(.white)
                     .cornerRadius(8)
+                if message.senderID == authViewModel.currentUser?.id {
+                            Button(action: {
+                                Task {
+                                    await boardViewModel.deleteMessage(boardId: board.id ?? "", messageId: message.id ?? "", senderID: message.senderID, authViewModel: authViewModel)
+                                }
+                            }) {
+                                Image(systemName: "trash")
+                                    .foregroundColor(.black)
+                            }
+                        }
                 senderImageView(senderPhotoUrl: message.senderPhotoUrl)
                     .onTapGesture {
                         // 送信者のプロファイルを取得し、表示を更新

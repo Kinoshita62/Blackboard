@@ -47,6 +47,13 @@ struct MainView: View {
                     }
                 }
             }
+            .onChange(of: authViewModel.userSession) {
+                if let _ = authViewModel.userSession {
+                    boardViewModel.fetchBoards {
+                        boardViewModel.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
+                    }
+                }
+            }
         }
     }
 }
@@ -132,9 +139,24 @@ extension MainView {
                     ForEach(boardViewModel.filteredBoards) { board in
                         NavigationLink(destination: BoardView(board: board)) {
                             VStack {
-                                Text(board.name)
-                                    .font(.headline)
-                                    .padding(.top, 40)
+                                HStack {
+                                    Text(board.name)
+                                        .font(.headline)
+                                        .padding(.top, 40)
+                                    if board.creatorID == authViewModel.currentUser?.id {
+                                        Button(action: {
+                                            Task {
+                                                await boardViewModel.deleteBoard(boardId: board.id ?? "", creatorID: board.creatorID, authViewModel: authViewModel) {
+                                                    print("掲示板削除後の処理")
+                                                }
+                                            }
+                                        }) {
+                                            Image(systemName: "trash")
+                                                .foregroundColor(.gray)
+                                        }
+                                    }
+                                }
+                                
                                 Text("投稿数 \(board.postCount)")
                                 Spacer()
                                 Text("作成日" + DateFormatterUtility.formatDate(board.createDate))
