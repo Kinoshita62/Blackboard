@@ -33,7 +33,7 @@ struct MyPageView: View {
             }
             .navigationTitle("マイページ")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden(true)
+            .navigationBarBackButtonHidden()
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("＜戻る") {
@@ -114,12 +114,7 @@ extension MyPageView {
                         .frame(width: 60, height: 60)
                 }
             } else {
-                Image(systemName: "person.circle")
-                    .resizable()
-                    .foregroundStyle(.gray)
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 60, height: 60)
-                    .clipShape(Circle())
+                DefaultImageIcon(iconSize: 60)
             }
             Text(authViewModel.currentUser?.name ?? "")
                 .font(.subheadline)

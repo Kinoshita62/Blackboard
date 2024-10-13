@@ -34,8 +34,9 @@ class BoardViewModel: ObservableObject {
                 var updatedBoards = [BoardModel]()
                 for document in documents {
                     do {
-                        var board = try document.data(as: BoardModel.self)
+                        var board = try document.data(as: BoardModel.self) //BoardModel型にデコード
                         let boardId = document.documentID
+                        board.id = boardId
                         let snapshot = try await Firestore.firestore().collection("boards").document(boardId).collection("messages").getDocuments() //サブコレクションからの取得
                         
                         board.postCount = snapshot.documents.count
@@ -71,7 +72,7 @@ class BoardViewModel: ObservableObject {
             )
         
         do {
-            let messageData = try Firestore.Encoder().encode(message)
+            let messageData = try Firestore.Encoder().encode(message) //<String, Any>型にエンコード
             try await Firestore.firestore().collection("boards").document(boardId).collection("messages").addDocument(data: messageData)
             print("メッセージ投稿成功")
         } catch {
@@ -80,26 +81,26 @@ class BoardViewModel: ObservableObject {
     }
     
     @MainActor
-    func addBoard(name: String, authViewModel: AuthViewModel, completion: @escaping () -> Void) async {
+    func addBoard(name: String, authViewModel: AuthViewModel, completion: @escaping () -> Void) async -> BoardModel? {
         guard let creatorID = authViewModel.currentUser?.id else {
                 print("ユーザーがログインしていません")
-                return
+                return nil
             }
-        let newBoard = BoardModel(id: nil, name: name, createDate: Date(), postCount: 0, creatorID: creatorID)
+        let newBoard = BoardModel(id: nil, name: name, createDate: Date(), postCount: 0, creatorID: creatorID) //IDは自動で生成
         do {
-            let ref = try await Firestore.firestore().collection("boards").addDocument(from: newBoard)
-            let documentID = ref.documentID
-                    print("新しい掲示板ID: \(documentID)")
-                    
-                    // 必要に応じてIDを設定したBoardModelを保存するか、必要な処理を行う
-                    var updatedBoard = newBoard
-                    updatedBoard.id = documentID
-            fetchBoards {
-                completion()
+                let ref = try await Firestore.firestore().collection("boards").addDocument(from: newBoard) // 追加ドキュメントの参照
+                let documentID = ref.documentID
+                print("新しい掲示板ID: \(documentID)")
+                
+                var updatedBoard = newBoard
+                updatedBoard.id = documentID
+            completion()
+                return updatedBoard
+            
+            } catch {
+                print("掲示板追加失敗: \(error.localizedDescription)")
+                return nil
             }
-        } catch {
-            print("掲示板追加失敗: \(error.localizedDescription)")
-        }
     }
     
     @MainActor

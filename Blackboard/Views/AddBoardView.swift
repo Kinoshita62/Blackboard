@@ -56,7 +56,7 @@ extension AddBoardView {
                 Task {
                     await boardViewModel.addBoard(name: boardName, authViewModel: authViewModel) {
                         onAddCompletion()
-                        dismiss()
+                        dismiss() 
                     }
                 }
                 isShowingAddBoardView = false

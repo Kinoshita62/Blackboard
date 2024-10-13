@@ -72,13 +72,13 @@ extension EditProfileView {
             //PhotoPicker
             PhotosPicker(selection: $authViewModel.selectedImage) {
                 Group {
-                    if let uiImage = authViewModel.profileImage {
+                    if let uiImage = authViewModel.profileImage { // 選択された画像
                         Image(uiImage: uiImage)
                             .resizable()
                             .aspectRatio(contentMode: .fill)
                             .frame(width: 120, height: 120)
                             .clipShape(Circle())
-                    } else if let urlString = authViewModel.currentUser?.photoUrl, let url = URL(string: urlString) {
+                    } else if let urlString = authViewModel.currentUser?.photoUrl, let url = URL(string: urlString) { // 登録された画像
                         AsyncImage(url: url) { image in
                             image
                                 .resizable()

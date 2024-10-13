@@ -66,7 +66,6 @@ extension LoginView {
     private var navigateToRegistration: some View {
         NavigationLink {
             RegistrationView()
-                .navigationBarBackButtonHidden()
         } label: {
             HStack {
                 Text("まだアカウントをお持ちでない方")

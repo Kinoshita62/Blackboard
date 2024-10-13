@@ -37,7 +37,6 @@ struct MainView: View {
                         boardViewModel.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
                     }
                 })
-                
                 .presentationDragIndicator(.visible)
             }
             .onAppear {
@@ -133,43 +132,42 @@ extension MainView {
     }
     
     private var boardListArea: some View {
-        ZStack {
-            ScrollView {
-                LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(boardViewModel.filteredBoards) { board in
-                        NavigationLink(destination: BoardView(board: board)) {
-                            VStack {
-                                HStack {
-                                    Text(board.name)
-                                        .font(.headline)
-                                        .padding(.top, 40)
-                                    if board.creatorID == authViewModel.currentUser?.id {
-                                        Button(action: {
-                                            Task {
-                                                await boardViewModel.deleteBoard(boardId: board.id ?? "", creatorID: board.creatorID, authViewModel: authViewModel) {
-                                                    print("掲示板削除後の処理")
-                                                }
+        ScrollView {
+            LazyVGrid(columns: columns, spacing: 16) {
+                ForEach(boardViewModel.filteredBoards) { board in
+                    NavigationLink(destination: BoardView(board: board)) {
+                        VStack {
+                            HStack {
+                                Text(board.name)
+                                    .font(.headline)
+                                if board.creatorID == authViewModel.currentUser?.id {
+                                    Button(action: {
+                                        Task {
+                                            await boardViewModel.deleteBoard(boardId: board.id ?? "", creatorID: board.creatorID, authViewModel: authViewModel) {
+                                                print("掲示板削除")
                                             }
-                                        }) {
-                                            Image(systemName: "trash")
-                                                .foregroundColor(.gray)
                                         }
+                                    }) {
+                                        Image(systemName: "trash")
+                                            .foregroundColor(.gray)
                                     }
                                 }
-                                
-                                Text("投稿数 \(board.postCount)")
-                                Spacer()
-                                Text("作成日" + DateFormatterUtility.formatDate(board.createDate))
-                                    .padding(.bottom)
-                                
                             }
-                            .foregroundColor(.black)
-                            .frame(width: 150, height: 150)
-                            .background(.green)
+                            .padding(.top, 40)
+                            
+                            Text("投稿数 \(board.postCount)")
+                            Spacer()
+                            Text("作成日" + DateFormatterUtility.formatDate(board.createDate))
+                                .padding(.bottom)
+                            
                         }
+                        .foregroundColor(.black)
+                        .frame(width: 150, height: 150)
+                        .background(.green)
                     }
                 }
             }
         }
     }
 }
+

@@ -10,7 +10,7 @@ import FirebaseFirestore
 
 struct BoardView: View {
     
-    var board: BoardModel
+    private var board: BoardModel
     @State private var newMessage = ""
     @ObservedObject var boardViewModel = BoardViewModel()
     @EnvironmentObject var authViewModel: AuthViewModel
@@ -21,6 +21,10 @@ struct BoardView: View {
     
     @State private var isShowingSenderProfile = false
     @State private var selectedSender: UserModel?
+    
+    init(board: BoardModel) {
+            self.board = board
+        }
     
     var body: some View {
         
@@ -163,7 +167,7 @@ extension BoardView {
                 if message.senderID == authViewModel.currentUser?.id {
                             Button(action: {
                                 Task {
-                                    await boardViewModel.deleteMessage(boardId: board.id ?? "", messageId: message.id ?? "", senderID: message.senderID, authViewModel: authViewModel)
+                                    await boardViewModel.deleteMessage(boardId: board.id ?? "", messageId: message.id, senderID: message.senderID, authViewModel: authViewModel)
                                 }
                             }) {
                                 Image(systemName: "trash")
@@ -211,7 +215,7 @@ extension BoardView {
     
     private func getSenderProfile(senderID: String) {
         Firestore.firestore().collection("users").document(senderID).getDocument { document, error in
-            if let document = document, document.exists {
+            if let document = document {
                 do {
                     // ドキュメントを UserModel にデコード
                     let user = try document.data(as: UserModel.self)
