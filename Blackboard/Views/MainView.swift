@@ -14,6 +14,8 @@ struct MainView: View {
     @State private var isShowingAddBoardView = false
     @State private var searchText = ""
     @State private var isSortedByPostCount = false
+    @State private var isShowingDeleteAlert = false
+    @State private var boardToDelete: BoardModel?
     
     let columns: [GridItem] = [
         GridItem(spacing: 8),
@@ -40,18 +42,38 @@ struct MainView: View {
                 .presentationDragIndicator(.visible)
             }
             .onAppear {
-                if let _ = authViewModel.userSession {
-                    boardViewModel.fetchBoards {
-                        boardViewModel.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
-                    }
+                
+                boardViewModel.fetchBoards {
+                    boardViewModel.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
                 }
+                
             }
             .onChange(of: authViewModel.userSession) {
-                if let _ = authViewModel.userSession {
-                    boardViewModel.fetchBoards {
-                        boardViewModel.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
-                    }
+                
+                boardViewModel.fetchBoards {
+                    boardViewModel.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
                 }
+                
+            }
+            .alert(isPresented: $isShowingDeleteAlert) {
+                Alert(
+                    title: Text("注意"),
+                    message: Text("消去したデータは復元できません。削除しますか？"),
+                    primaryButton: .destructive(Text("削除する"), action: {
+                        if let board = boardToDelete {
+                            Task {
+                                await boardViewModel.deleteBoard(boardId: board.id ?? "", creatorID: board.creatorID, authViewModel: authViewModel) {
+                                    print("掲示板削除完了")
+                                    boardViewModel.fetchBoards {
+                                        boardViewModel.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
+                                    }
+                                    boardToDelete = nil
+                                }
+                            }
+                        }
+                    }),
+                    secondaryButton: .cancel(Text("キャンセル"))
+                )
             }
         }
     }
@@ -142,15 +164,13 @@ extension MainView {
                                     .font(.headline)
                                 if board.creatorID == authViewModel.currentUser?.id {
                                     Button(action: {
-                                        Task {
-                                            await boardViewModel.deleteBoard(boardId: board.id ?? "", creatorID: board.creatorID, authViewModel: authViewModel) {
-                                                print("掲示板削除")
-                                            }
-                                        }
+                                        boardToDelete = board
+                                        isShowingDeleteAlert.toggle()
                                     }) {
                                         Image(systemName: "trash")
-                                            .foregroundColor(.gray)
+                                            .foregroundColor(.black)
                                     }
+                                    
                                 }
                             }
                             .padding(.top, 40)

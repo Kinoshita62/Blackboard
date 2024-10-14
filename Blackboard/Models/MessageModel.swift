@@ -9,7 +9,7 @@ import Foundation
 import FirebaseFirestore
 
 struct MessageModel: Identifiable, Codable, Equatable {
-    var id: String
+    var id: String?
     var senderID: String
     var content: String
     var senderName: String

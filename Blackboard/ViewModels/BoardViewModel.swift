@@ -62,18 +62,19 @@ class BoardViewModel: ObservableObject {
         }
         let senderPhotoUrl = authViewModel.currentUser?.photoUrl
         // UUIDを使って一意のIDを生成
-        let message = MessageModel(
-                id: UUID().uuidString,
-                senderID: senderID,
-                content: content,
-                senderName: senderName,
-                senderPhotoUrl: senderPhotoUrl,
-                timestamp: Date()
-            )
+        var message = MessageModel(
+            id: nil,
+            senderID: senderID,
+            content: content,
+            senderName: senderName,
+            senderPhotoUrl: senderPhotoUrl,
+            timestamp: Date()
+        )
         
         do {
-            let messageData = try Firestore.Encoder().encode(message) //<String, Any>型にエンコード
-            try await Firestore.firestore().collection("boards").document(boardId).collection("messages").addDocument(data: messageData)
+            let ref = try await Firestore.firestore().collection("boards").document(boardId).collection("messages").addDocument(from: message)
+            message.id = ref.documentID
+            try await Firestore.firestore().collection("boards").document(boardId).collection("messages").document(ref.documentID).updateData(["id": message.id!])
             print("メッセージ投稿成功")
         } catch {
             print("メッセージ投稿失敗: \(error.localizedDescription)")
@@ -83,24 +84,24 @@ class BoardViewModel: ObservableObject {
     @MainActor
     func addBoard(name: String, authViewModel: AuthViewModel, completion: @escaping () -> Void) async -> BoardModel? {
         guard let creatorID = authViewModel.currentUser?.id else {
-                print("ユーザーがログインしていません")
-                return nil
-            }
+            print("ユーザーがログインしていません")
+            return nil
+        }
         let newBoard = BoardModel(id: nil, name: name, createDate: Date(), postCount: 0, creatorID: creatorID) //IDは自動で生成
         do {
-                let ref = try await Firestore.firestore().collection("boards").addDocument(from: newBoard) // 追加ドキュメントの参照
-                let documentID = ref.documentID
-                print("新しい掲示板ID: \(documentID)")
-                
-                var updatedBoard = newBoard
-                updatedBoard.id = documentID
-            completion()
-                return updatedBoard
+            let ref = try await Firestore.firestore().collection("boards").addDocument(from: newBoard) // 追加ドキュメントの参照
+            let documentID = ref.documentID
+            print("新しい掲示板ID: \(documentID)")
             
-            } catch {
-                print("掲示板追加失敗: \(error.localizedDescription)")
-                return nil
-            }
+            var updatedBoard = newBoard
+            updatedBoard.id = documentID
+            completion()
+            return updatedBoard
+            
+        } catch {
+            print("掲示板追加失敗: \(error.localizedDescription)")
+            return nil
+        }
     }
     
     @MainActor
@@ -170,9 +171,20 @@ class BoardViewModel: ObservableObject {
             print("メッセージの送信者のみが削除できます")
             return
         }
+        guard !messageId.isEmpty else {
+                print("メッセージIDが無効です")
+                return
+            }
         do {
-            try await Firestore.firestore().collection("boards").document(boardId).collection("messages").document(messageId).delete()
-            print("メッセージ削除成功")
+            let messageRef = Firestore.firestore().collection("boards").document(boardId).collection("messages").document(messageId)
+            let documentSnapshot = try await messageRef.getDocument()
+            
+            if documentSnapshot.exists {
+                try await messageRef.delete()
+                print("メッセージ削除成功")
+            } else {
+                print("メッセージが見つかりません")
+            }
         } catch {
             print("メッセージ削除失敗: \(error.localizedDescription)")
         }

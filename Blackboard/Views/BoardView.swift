@@ -21,10 +21,12 @@ struct BoardView: View {
     
     @State private var isShowingSenderProfile = false
     @State private var selectedSender: UserModel?
+    @State private var isShowingDeleteAlert = false
+    @State private var messageToDelete: MessageModel?
     
     init(board: BoardModel) {
-            self.board = board
-        }
+        self.board = board
+    }
     
     var body: some View {
         
@@ -66,6 +68,20 @@ struct BoardView: View {
                         }
                     }
                 }
+            )
+        }
+        .alert(isPresented: $isShowingDeleteAlert) {
+            Alert(
+                title: Text("注意"),
+                message: Text("「\(messageToDelete?.content ?? "メッセージ")」を削除しますか？この操作は取り消せません。"),
+                primaryButton: .destructive(Text("削除する"), action: {
+                    Task {
+                        await boardViewModel.deleteMessage(boardId: board.id ?? "", messageId: messageToDelete?.id ?? "", senderID: messageToDelete?.senderID ?? "", authViewModel: authViewModel)
+                        boardViewModel.fetchMessages(boardId: board.id ?? "")
+                        messageToDelete = nil
+                    }
+                }),
+                secondaryButton: .cancel(Text("キャンセル"))
             )
         }
     }
@@ -153,27 +169,23 @@ extension BoardView {
                 Spacer()
             } else {
                 Spacer()
-              
-                    Text(DateFormatterUtility.formatDate(message.timestamp))
-                        .font(.system(size: 10))
-                        .foregroundColor(.black)
-                    
+                
+                Text(DateFormatterUtility.formatDate(message.timestamp))
+                    .font(.system(size: 10))
+                    .foregroundColor(.black)
+                
                 
                 Text(message.content)
                     .font(.body)
                     .padding(5)
                     .background(.white)
                     .cornerRadius(8)
-                if message.senderID == authViewModel.currentUser?.id {
-                            Button(action: {
-                                Task {
-                                    await boardViewModel.deleteMessage(boardId: board.id ?? "", messageId: message.id, senderID: message.senderID, authViewModel: authViewModel)
-                                }
-                            }) {
-                                Image(systemName: "trash")
-                                    .foregroundColor(.black)
-                            }
+                    .onLongPressGesture {
+                        if let currentUserID = authViewModel.currentUser?.id, message.senderID == authViewModel.currentUser?.id {
+                            messageToDelete = message
+                            isShowingDeleteAlert = true
                         }
+                    }
                 senderImageView(senderPhotoUrl: message.senderPhotoUrl)
                     .onTapGesture {
                         // 送信者のプロファイルを取得し、表示を更新
