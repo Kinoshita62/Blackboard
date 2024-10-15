@@ -10,12 +10,13 @@ import SwiftUI
 struct MainView: View {
     
     @EnvironmentObject var authViewModel: AuthViewModel
-    @ObservedObject private var boardViewModel = BoardViewModel()
+    @StateObject private var boardViewModel = BoardViewModel() //View自身で管理するため
     @State private var isShowingAddBoardView = false
     @State private var searchText = ""
     @State private var isSortedByPostCount = false
     @State private var isShowingDeleteAlert = false
     @State private var boardToDelete: BoardModel?
+    @State private var isLoading = true
     
     let columns: [GridItem] = [
         GridItem(spacing: 8),
@@ -27,10 +28,13 @@ struct MainView: View {
             VStack {
                 header
                 
-                searchFilterArea
-                
-                boardListArea
-                
+                if isLoading {
+                    Text("Loading...")
+                        .padding()
+                } else {
+                    searchFilterArea
+                    boardListArea
+                }
             }
             .padding(.horizontal)
             .sheet(isPresented: $isShowingAddBoardView) {
@@ -42,16 +46,21 @@ struct MainView: View {
                 .presentationDragIndicator(.visible)
             }
             .onAppear {
-                
-                boardViewModel.fetchBoards {
-                    boardViewModel.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
-                }
+                print("Fetching boards...")
+                    boardViewModel.fetchBoards {
+                        DispatchQueue.main.async {
+                            boardViewModel.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
+                            isLoading = false
+                            print("Fetched boards: \(boardViewModel.boards)")
+                        }
+                    }
                 
             }
             .onChange(of: authViewModel.userSession) {
                 
                 boardViewModel.fetchBoards {
                     boardViewModel.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
+                    isLoading = false
                 }
                 
             }
@@ -66,6 +75,7 @@ struct MainView: View {
                                     print("掲示板削除完了")
                                     boardViewModel.fetchBoards {
                                         boardViewModel.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
+                                        isLoading = false
                                     }
                                     boardToDelete = nil
                                 }

@@ -234,7 +234,7 @@ extension BoardView {
                     DispatchQueue.main.async {
                         // Firestoreから取得したUserModelをselectedSenderにセット
                         self.selectedSender = user
-                        self.isShowingSenderProfile = true // プロファイルの表示フラグを設定
+                        self.isShowingSenderProfile = true
                     }
                 } catch {
                     print("Error decoding user: \(error.localizedDescription)")
