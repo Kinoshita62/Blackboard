@@ -14,4 +14,6 @@ struct BoardModel: Identifiable, Codable {
     var createDate: Date
     var postCount: Int
     var creatorID: String
+    var boardDescription: String?
+    var creatorName: String?
 }

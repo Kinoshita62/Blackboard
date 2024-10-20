@@ -17,7 +17,7 @@ struct MainView: View {
     @State private var isShowingDeleteAlert = false
     @State private var boardToDelete: BoardModel?
     @State private var isLoading = true
-    
+
     let columns: [GridItem] = [
         GridItem(spacing: 8),
         GridItem(spacing: 8)
@@ -47,13 +47,13 @@ struct MainView: View {
             }
             .onAppear {
                 print("Fetching boards...")
-                    boardViewModel.fetchBoards {
-                        DispatchQueue.main.async {
-                            boardViewModel.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
-                            isLoading = false
-                            print("Fetched boards: \(boardViewModel.boards)")
-                        }
+                boardViewModel.fetchBoards {
+                    DispatchQueue.main.async {
+                        boardViewModel.filteredBoards = boardViewModel.getFilteredBoards(searchText: searchText, isSortedByPostCount: isSortedByPostCount)
+                        isLoading = false
+                        print("Fetched boards: \(boardViewModel.boards)")
                     }
+                }
                 
             }
             .onChange(of: authViewModel.userSession) {
@@ -184,12 +184,19 @@ extension MainView {
                                 }
                             }
                             .padding(.top, 40)
-                            
                             Text("投稿数 \(board.postCount)")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
                             Spacer()
                             Text("作成日" + DateFormatterUtility.formatDate(board.createDate))
-                                .padding(.bottom)
-                            
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                            if let creatorName = board.creatorName {
+                                Text("作成者: \(creatorName)")
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                                    .padding(.bottom)
+                            }
                         }
                         .foregroundColor(.black)
                         .frame(width: 150, height: 150)

@@ -32,11 +32,13 @@ struct BoardView: View {
         
         NavigationStack {
             VStack {
-                messageArea
-                imputArea
+                VStack {
+                    titleArea
+                    messageArea
+                }
+                .background(.green)
+                inputArea
             }
-            .navigationTitle(board.name)
-            .navigationBarTitleDisplayMode(.automatic)
             .navigationBarBackButtonHidden(true)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -93,6 +95,27 @@ struct BoardView: View {
 }
 
 extension BoardView {
+    private var titleArea: some View {
+        VStack {
+            HStack {
+                Text(board.name)
+                    .font(.title)
+                    .bold()
+                Spacer()
+            }
+            if let description = board.boardDescription, !description.isEmpty {
+                HStack {
+                    Text(description)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                }
+            }
+        }
+        .padding(.horizontal)
+    }
+    
+    
     private var messageArea: some View {
         ScrollViewReader { proxy in
             VStack {
@@ -117,12 +140,11 @@ extension BoardView {
                 .frame(maxWidth: .infinity)
             }
             .padding()
-            .background(.green)
         }
         
     }
     
-    private var imputArea: some View {
+    private var inputArea: some View {
         VStack {
             HStack {
                 messageTextField
@@ -181,7 +203,7 @@ extension BoardView {
                     .background(.white)
                     .cornerRadius(8)
                     .onLongPressGesture {
-                        if let currentUserID = authViewModel.currentUser?.id, message.senderID == authViewModel.currentUser?.id {
+                        if let _ = authViewModel.currentUser?.id, message.senderID == authViewModel.currentUser?.id {
                             messageToDelete = message
                             isShowingDeleteAlert = true
                         }
@@ -207,12 +229,13 @@ extension BoardView {
         Button(action: {
             if !newMessage.isEmpty {
                 let messageToSend = newMessage
-                
-                newMessage = ""
                 isInputFieldFocused = false
                 
                 Task {
                     await sendMessage(message: messageToSend)
+                    DispatchQueue.main.async {
+                        newMessage = ""
+                    }
                 }
             }
         }, label: {

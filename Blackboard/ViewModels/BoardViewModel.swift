@@ -40,6 +40,12 @@ class BoardViewModel: ObservableObject {
                         let snapshot = try await Firestore.firestore().collection("boards").document(boardId).collection("messages").getDocuments() //サブコレクションからの取得
                         
                         board.postCount = snapshot.documents.count
+                        
+                        let userSnapshot = try await Firestore.firestore().collection("users").document(board.creatorID).getDocument()
+                        if let userData = userSnapshot.data(), let creatorName = userData["name"] as? String {
+                            board.creatorName = creatorName
+                        }
+                        
                         updatedBoards.append(board)
                     } catch {
                         print("データのデコードに失敗しました: \(error.localizedDescription)")
@@ -172,9 +178,9 @@ class BoardViewModel: ObservableObject {
             return
         }
         guard !messageId.isEmpty else {
-                print("メッセージIDが無効です")
-                return
-            }
+            print("メッセージIDが無効です")
+            return
+        }
         do {
             let messageRef = Firestore.firestore().collection("boards").document(boardId).collection("messages").document(messageId)
             let documentSnapshot = try await messageRef.getDocument()
@@ -189,4 +195,36 @@ class BoardViewModel: ObservableObject {
             print("メッセージ削除失敗: \(error.localizedDescription)")
         }
     }
+    
+    @MainActor
+    func updateBoardDescription(boardId: String, newDescription: String, authViewModel: AuthViewModel) async {
+        guard let currentUserID = authViewModel.currentUser?.id else {
+            print("ユーザーがログインしていません")
+            return
+        }
+        
+        let boardRef = Firestore.firestore().collection("boards").document(boardId)
+        
+        do {
+            let documentSnapshot = try await boardRef.getDocument()
+            
+            let board = try documentSnapshot.data(as: BoardModel.self)
+            
+            if board.creatorID != currentUserID {
+                print("掲示板の作成者のみが説明文を更新できます")
+                return
+            }
+            
+            try await boardRef.updateData(["boardDescription": newDescription])
+            print("説明文の更新に成功しました")
+            
+            if let index = self.boards.firstIndex(where: { $0.id == boardId }) {
+                self.boards[index].boardDescription = newDescription
+            }
+            
+        } catch {
+            print("説明文の更新に失敗しました: \(error.localizedDescription)")
+        }
+    }
+    
 }
